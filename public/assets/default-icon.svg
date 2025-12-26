@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_图层_1" data-name="图层_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 28 28">
+  <!-- Generator: Adobe Illustrator 30.0.0, SVG Export Plug-In . SVG Version: 2.1.1 Build 123)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: #919fb9;
+        fill-opacity: .17;
+      }
+    </style>
+  </defs>
+  <path class="st0" d="M27.27,14c0,10.57-2.71,13.27-13.27,13.27S.73,24.57.73,14,3.43.73,14,.73s13.27,2.71,13.27,13.27Z"/>
+  <path class="st0" d="M21.96,6.5v14.99h-3.56v-8.78l-4.41,6.02-4.39-6.02v8.78h-3.56V6.5h3.38l4.59,6.66,4.56-6.66h3.39Z"/>
+</svg>
