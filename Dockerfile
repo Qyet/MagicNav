@@ -8,10 +8,10 @@ ENV TZ=Asia/Shanghai
 # Install dependencies
 COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
 RUN \
-  if [ -f package-lock.json ]; then npm ci --only=production; \
+  if [ -f package-lock.json ]; then npm ci --omit=dev; \
   elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i --frozen-lockfile --prod; \
   elif [ -f yarn.lock ]; then yarn --frozen-lockfile --production; \
-  else npm install --only=production; \
+  else npm install --omit=dev; \
   fi
 
 # Copy source files
