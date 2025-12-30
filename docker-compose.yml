@@ -12,8 +12,7 @@ services:
       - "5432:5432"
 
   magicnav:
-    image: node:18-bullseye
-    command: sh -c "npm install && npm run build && npm start"
+    build: .
     restart: unless-stopped
     ports:
       - "3000:3000"
