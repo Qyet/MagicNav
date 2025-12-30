@@ -6,12 +6,17 @@ import pLimit from "p-limit";
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
+interface FolderMapItem {
+  tempId: string;
+  id: string;
+}
+
 export async function POST(
   request: Request,
 ) {
   try {
     // Parse imported data
-    const { bookmarks, collectionId, folderMap } = await request.json();
+    const { bookmarks, collectionId, folderMap }: { bookmarks: ExportedBookmark[]; collectionId: string; folderMap: FolderMapItem[] } = await request.json();
     
     // Removed restriction: allow creating multiple collections
     
@@ -24,7 +29,7 @@ export async function POST(
       bookmarks.map((bookmark: ExportedBookmark) => 
         limit(async () => {
           const folderId = bookmark.folderTempId
-            ? folderMap.find((item: any) => item.tempId === bookmark.folderTempId)?.id
+            ? folderMap.find((item: FolderMapItem) => item.tempId === bookmark.folderTempId)?.id
             : undefined;
 
           let icon = bookmark.icon || "";

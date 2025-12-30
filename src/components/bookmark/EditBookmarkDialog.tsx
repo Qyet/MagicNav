@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import {
   Dialog,
   DialogContent,
@@ -334,9 +335,11 @@ export function EditBookmarkDialog({
               </div>
               {formData.icon && (
                 <div className="flex items-center">
-                  <img
+                  <Image
                     src={formData.icon}
                     alt="Icon preview"
+                    width={32}
+                    height={32}
                     className="w-8 h-8 object-contain"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
@@ -384,9 +387,11 @@ export function EditBookmarkDialog({
               <div className="mt-2">
                 <Label className="text-sm text-gray-500">Server icon preview</Label>
                 <div className="mt-1 p-2 border rounded">
-                  <img
+                  <Image
                     src={localIconUrl}
                     alt="Server icon preview"
+                    width={48}
+                    height={48}
                     className="w-12 h-12 object-contain"
                   />
                 </div>
@@ -406,14 +411,16 @@ export function EditBookmarkDialog({
                       }`}
                       onClick={() => setFormData(prev => ({ ...prev, icon: iconUrl }))}
                     >
-                      <img
-                        src={iconUrl}
-                        alt={`Icon ${index + 1}`}
-                        className="w-6 h-6 object-contain mx-auto"
-                        onError={(e) => {
-                          (e.currentTarget.parentElement as HTMLElement).style.display = 'none';
-                        }}
-                      />
+                      <Image
+                          src={iconUrl}
+                          alt={`Icon ${index + 1}`}
+                          width={24}
+                          height={24}
+                          className="w-6 h-6 object-contain mx-auto"
+                          onError={(e) => {
+                            (e.currentTarget.parentElement as HTMLElement).style.display = 'none';
+                          }}
+                        />
                     </button>
                   ))}
                 </div>

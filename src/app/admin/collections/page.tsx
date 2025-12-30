@@ -24,7 +24,7 @@ export default function CollectionsPage() {
     fetchCollections();
   };
 
-  const handleCollectionsChange = (collections: any[]) => {
+  const handleCollectionsChange = (collections: { id: string; name: string; slug: string }[]) => {
     setHasCollections(collections.length > 0);
   };
 

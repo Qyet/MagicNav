@@ -13,6 +13,7 @@ import {
 import { EditBookmarkDialog } from "./EditBookmarkDialog";
 import { EditFolderDialog } from "@/components/folder/EditFolderDialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import Image from "next/image";
 import {
   Dialog,
   DialogContent,
@@ -63,7 +64,7 @@ interface BookmarkDataTableProps {
   folders: Folder[];
   bookmarks: {
     currentBookmarks: Bookmark[];
-    subfolders: any[]; // 如果需要使用 subfolders，可以定义更具体的类型
+    subfolders: Folder[];
   };
   currentFolderId?: string;
   onFolderClick: (folderId: string) => void;
@@ -79,6 +80,7 @@ type TableItem = {
   id: string;
   type: "folder" | "bookmark";
   title: string;
+  name?: string;
   url?: string;
   icon?: string;
   description?: string;
@@ -89,6 +91,10 @@ type TableItem = {
     name: string;
   };
   collectionId: string;
+  sortOrder: number;
+  parentId: string | null;
+  isPublic?: boolean;
+  password?: string;
 };
 
 export function BookmarkDataTable({
@@ -133,7 +139,9 @@ export function BookmarkDataTable({
       createdAt: bookmark.createdAt,
       updatedAt: bookmark.updatedAt,
       viewCount: bookmark.viewCount,
-      collectionId: bookmark.collectionId
+      collectionId: bookmark.collectionId,
+      sortOrder: bookmark.sortOrder,
+      parentId: bookmark.folderId || null
     }))
   ];
 
@@ -147,9 +155,9 @@ export function BookmarkDataTable({
     const aValue = a[sortField as keyof typeof a];
     const bValue = b[sortField as keyof typeof b];
     
-    // 处理undefined值，确保它们可以被比较
-    const safeA = aValue !== undefined ? aValue : "";
-    const safeB = bValue !== undefined ? bValue : "";
+    // 处理undefined和null值，确保它们可以被比较
+    const safeA = aValue ?? "";
+    const safeB = bValue ?? "";
     
     if (safeA < safeB) return sortOrder === "asc" ? -1 : 1;
     if (safeA > safeB) return sortOrder === "asc" ? 1 : -1;
@@ -271,9 +279,11 @@ export function BookmarkDataTable({
                 <TableCell>
                   {item.type === "bookmark" && item.icon && (
                     <div className="flex items-center justify-center">
-                      <img 
+                      <Image 
                         src={item.icon} 
                         alt="icon" 
+                        width={32}
+                        height={32}
                         className="w-8 h-8 rounded-full object-cover border border-gray-200"
                         onError={(e) => {
                           (e.target as HTMLImageElement).style.display = 'none'
@@ -366,7 +376,7 @@ function TableActions({ item, onUpdate }: { item: TableItem; onUpdate: () => voi
       {/* 编辑对话框 */}
       {item.type === "folder" ? (
         <EditFolderDialog
-          folder={item as any}
+          folder={{ ...item, name: item.name || item.title, isPublic: item.isPublic || false }}
           open={isEditDialogOpen}
           onOpenChange={setIsEditDialogOpen}
           onSuccess={onUpdate}
@@ -374,7 +384,7 @@ function TableActions({ item, onUpdate }: { item: TableItem; onUpdate: () => voi
         />
       ) : (
         <EditBookmarkDialog
-          bookmark={item as any}
+          bookmark={{ ...item, url: item.url || "", isFeatured: item.isFeatured || false }}
           open={isEditDialogOpen}
           onOpenChange={setIsEditDialogOpen}
           onSuccess={onUpdate}
@@ -387,7 +397,7 @@ function TableActions({ item, onUpdate }: { item: TableItem; onUpdate: () => voi
           <DialogHeader>
             <DialogTitle>Delete {item.type === "folder" ? "folder" : "bookmark"}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{item.title}" this {item.type === "folder" ? "folder" : "bookmark"}? This action cannot be undone.
+              Are you sure you want to delete &quot;{item.title}&quot; this {item.type === "folder" ? "folder" : "bookmark"}? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

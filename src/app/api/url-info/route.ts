@@ -156,13 +156,13 @@ export async function POST(request: Request) {
       const $ = cheerio.load(html);
 
       // 获取标题
-      let title = $("title").text() || 
+      const title = $("title").text() || 
                  $('meta[property="og:title"]').attr("content") || 
                  $('meta[name="twitter:title"]').attr("content") || 
                  domain;
 
       // 获取描述
-      let description = $('meta[name="description"]').attr("content") || 
+      const description = $('meta[name="description"]').attr("content") || 
                        $('meta[property="og:description"]').attr("content") || 
                        $('meta[name="twitter:description"]').attr("content") || 
                        "";

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, FolderPlus, ChevronRight, ChevronLeft } from "lucide-react";
 import { BookmarkDataTable } from "@/components/bookmark/BookmarkDataTable";
@@ -62,7 +62,7 @@ export default function BookmarksPage() {
   const [selectedCollectionId, setSelectedCollectionId] = useState<string>("");
   const [bookmarks, setBookmarks] = useState<{
     currentBookmarks: Bookmark[];
-    subfolders: any[];
+    subfolders: Folder[];
   }>({
     currentBookmarks: [],
     subfolders: []
@@ -82,13 +82,48 @@ export default function BookmarksPage() {
   useEffect(() => {
     setSortField("createdAt");
     setSortOrder("desc");
-  }, [selectedCollectionId]);
+  }, [selectedCollectionId, setSortField, setSortOrder]);
 
-  useEffect(() => {
-    fetchCollections();
-  }, []);
+  const fetchBookmarks = useCallback(async (collectionId: string) => {
+    try {
+      setLoading(true);
+      const queryParams = new URLSearchParams({
+        sortField,
+        sortOrder,
+        ...(currentFolderId ? { folderId: currentFolderId } : {})
+      });
 
-  const fetchCollections = async () => {
+      const response = await fetch(
+        `/api/admin/collections/${collectionId}/bookmarks?${queryParams}`
+      );
+      const data = await response.json();
+
+      // 确保设置正确的数据结构
+      setBookmarks({
+        currentBookmarks: data.currentBookmarks || [],
+        subfolders: data.subfolders || []
+      });
+    } catch (error) {
+      console.error("获取书签失败:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [currentFolderId, sortField, sortOrder, setLoading, setBookmarks]);
+
+  const fetchFolders = useCallback(async (collectionId: string = selectedCollectionId) => {
+    try {
+      const response = await fetch(
+        `/api/collections/${collectionId}/folders?` +
+        (currentFolderId ? `parentId=${currentFolderId}` : '')
+      );
+      const data = await response.json();
+      setFolders(data);
+    } catch (error) {
+      console.error("Get folders failed:", error);
+    }
+  }, [currentFolderId, selectedCollectionId, setFolders]);
+
+  const fetchCollections = useCallback(async () => {
     try {
       const response = await fetch("/api/collections");
       const data = await response.json();
@@ -104,7 +139,7 @@ export default function BookmarksPage() {
         // 使用默认排序获取书签数据
         setSortField("createdAt");
         setSortOrder("desc");
-        Promise.all([
+        await Promise.all([
           fetchBookmarks(collectionId),
           fetchFolders(collectionId)
         ]);
@@ -115,7 +150,7 @@ export default function BookmarksPage() {
         // 使用默认排序获取书签数据
         setSortField("createdAt");
         setSortOrder("desc");
-        Promise.all([
+        await Promise.all([
           fetchBookmarks(firstCollectionId),
           fetchFolders(firstCollectionId)
         ]);
@@ -125,47 +160,13 @@ export default function BookmarksPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [fetchBookmarks, fetchFolders, router, searchParams, setCollections, setLoading, setSelectedCollectionId, setSortField, setSortOrder]);
 
-  const fetchBookmarks = async (collectionId: string) => {
-    try {
-      setLoading(true);
-      const queryParams = new URLSearchParams({
-        sortField,
-        sortOrder,
-        ...(currentFolderId ? { folderId: currentFolderId } : {})
-      });
+  useEffect(() => {
+    fetchCollections();
+  }, [fetchCollections]);
 
-      const response = await fetch(
-        `/api/admin/collections/${collectionId}/bookmarks?${queryParams}`
-      );
-      const data = await response.json();
 
-      
-      // 确保设置正确的数据结构
-      setBookmarks({
-        currentBookmarks: data.currentBookmarks || [],
-        subfolders: data.subfolders || []
-      });
-    } catch (error) {
-      console.error("获取书签失败:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchFolders = async (collectionId: string = selectedCollectionId) => {
-    try {
-      const response = await fetch(
-        `/api/collections/${collectionId}/folders?` +
-        (currentFolderId ? `parentId=${currentFolderId}` : '')
-      );
-      const data = await response.json();
-      setFolders(data);
-    } catch (error) {
-      console.error("Get folders failed:", error);
-    }
-  };
 
   const handleSortChange = async (field: "createdAt" | "updatedAt", order: "asc" | "desc") => {
 

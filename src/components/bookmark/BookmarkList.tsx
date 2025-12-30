@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { BookmarkCard } from "./BookmarkCard";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -31,13 +31,7 @@ export function BookmarkList({ collectionId }: BookmarkListProps) {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (collectionId) {
-      fetchBookmarks();
-    }
-  }, [collectionId]);
-
-  const fetchBookmarks = async () => {
+  const fetchBookmarks = useCallback(async () => {
     try {
       const response = await fetch(`/api/collections/${collectionId}/bookmarks`);
       const data = await response.json();
@@ -47,7 +41,13 @@ export function BookmarkList({ collectionId }: BookmarkListProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [collectionId, setBookmarks, setLoading]);
+
+  useEffect(() => {
+    if (collectionId) {
+      fetchBookmarks();
+    }
+  }, [collectionId, fetchBookmarks]);
 
   if (!collectionId) {
     return (

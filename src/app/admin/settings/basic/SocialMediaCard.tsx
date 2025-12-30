@@ -8,11 +8,26 @@ import {
   import { Input } from "@/components/ui/input";
   import { Label } from "@/components/ui/label";
 
+  interface Settings {
+    weixinUrl?: string;
+    githubUrl?: string;
+    twitterUrl?: string;
+    discordUrl?: string;
+    youtubeUrl?: string;
+    pinterestUrl?: string;
+    weiboUrl?: string;
+    bilibiliUrl?: string;
+    zhihuUrl?: string;
+    telegramUrl?: string;
+    linkedinUrl?: string;
+    [key: string]: string | undefined;
+  }
+
   const SocialMediaCard = ({
     settings,
     handleChange,
   }: {
-    settings: any;
+    settings: Settings;
     handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   }) => {
     const socialLinks = [

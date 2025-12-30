@@ -23,6 +23,30 @@ interface ImportCollectionDialogProps {
   onSuccess?: () => void;
 }
 
+interface FolderMapItem {
+  tempId: string;
+  id: string;
+}
+
+interface FolderResponse {
+  collectionId: string;
+  insideFolderMap: FolderMapItem[];
+  error?: string;
+}
+
+interface BookmarkResponse {
+  message: string;
+  importedBookmarkCount: number;
+  error?: string;
+}
+
+interface ImportResponse {
+  collectionId: string;
+  insideFolderMap?: FolderMapItem[];
+  message?: string;
+  error?: string;
+}
+
 export function ImportCollectionDialog({
   open,
   onOpenChange,
@@ -89,7 +113,7 @@ export function ImportCollectionDialog({
       let batchSize = 100; // Process 100 bookmarks per batch
 
       let importedCollectionId = null;
-      let folderMap: { [key: string]: string }[] = [];
+    let folderMap: FolderMapItem[] = [];
 
       const startTime = Date.now();
 
@@ -112,7 +136,7 @@ export function ImportCollectionDialog({
               folderMap: folderMap, // Pass existing folder mapping
             };
 
-            const folderResponse: any = await fetch(
+            const folderResponse = await fetch(
               "/api/collections/import-recover-data/recover-folders",
               {
                 method: "POST",
@@ -123,7 +147,7 @@ export function ImportCollectionDialog({
               }
             );
 
-            const folderData: any = await folderResponse.json();
+            const folderData: FolderResponse = await folderResponse.json();
 
             if (!folderResponse.ok) {
               toast({
@@ -160,7 +184,7 @@ export function ImportCollectionDialog({
             folderMap: folderMap, // Use folder mapping
           };
       
-          const response: any = await fetch("/api/collections/import-recover-data/recover-bookmarks", {
+          const response = await fetch("/api/collections/import-recover-data/recover-bookmarks", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -168,7 +192,7 @@ export function ImportCollectionDialog({
             body: JSON.stringify(requestData),
           });
       
-          const data: any = await response.json();
+          const data: BookmarkResponse = await response.json();
           const batchEndTime = Date.now();
           const batchDuration = (batchEndTime - batchStartTime) / 1000; // seconds
           const remainingBatches = Math.ceil((totalBookmarks - i - batchSize) / batchSize);
@@ -207,7 +231,7 @@ export function ImportCollectionDialog({
             folderMap: folderMap,
           };
 
-          const response: any = await fetch("/api/collections/import", {
+          const response = await fetch("/api/collections/import", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -215,7 +239,7 @@ export function ImportCollectionDialog({
             body: JSON.stringify(requestData),
           });
 
-          const data: any = await response.json();
+          const data: ImportResponse = await response.json();
           const batchEndTime = Date.now();
           const batchDuration = (batchEndTime - batchStartTime) / 1000; // seconds
           const remainingBatches = Math.ceil(

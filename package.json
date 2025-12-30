@@ -6,7 +6,12 @@
   "type": "module",
   "author": "Qyet",
   "license": "MIT",
-  "keywords": ["bookmark-manager", "nextjs", "react", "typescript"],
+  "keywords": [
+    "bookmark-manager",
+    "nextjs",
+    "react",
+    "typescript"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/Qyet/MagicNav.git"

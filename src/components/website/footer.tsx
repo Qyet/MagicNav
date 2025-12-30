@@ -61,7 +61,7 @@ export function Footer() {
           {/* 左侧 Powered by 信息，根据设置显示 */}
           {settings.showPoweredBy === "true" && (
             <div className="text-sm text-muted-foreground order-first md:order-none flex items-center gap-1 min-w-0 lg:min-w-[200px] justify-center md:justify-start">
-              <img src="/logo.svg" alt="MagicNav Logo" className="h-5 w-5" />
+              <Image src="/logo.svg" alt="MagicNav Logo" width={20} height={20} className="h-5 w-5" />
               Powered by{' '}
               <Link
                 href="https://maijukeji.com"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { CollectionCard } from "./CollectionCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Plus, Upload } from "lucide-react";
@@ -38,16 +38,13 @@ export function CollectionList({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    fetchCollections();
-  }, []);
-
-  const fetchCollections = async () => {
+  const fetchCollections = useCallback(async () => {
     try {
       const response = await fetch("/api/collections");
       if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
+
       const data = await response.json();
 
       // 确保返回的数据是数组
@@ -65,7 +62,11 @@ export function CollectionList({
     } finally {
       setLoading(false);
     }
-  };
+  }, [onCollectionsChange, setCollections, setError, setLoading]);
+
+  useEffect(() => {
+    fetchCollections();
+  }, [fetchCollections]);
 
   if (loading) {
     return (
@@ -111,7 +112,7 @@ export function CollectionList({
           </svg>
           <h3 className="mt-4 text-lg font-semibold">No bookmark collections</h3>
           <p className="mb-4 mt-2 text-sm text-muted-foreground">
-            You haven't created any bookmark collections yet. Start creating your first bookmark collection now.
+            You haven&apos;t created any bookmark collections yet. Start creating your first bookmark collection now.
           </p>
           <div className="flex gap-2">
             <Button

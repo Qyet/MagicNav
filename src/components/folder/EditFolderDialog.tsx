@@ -61,9 +61,18 @@ export function EditFolderDialog({
 
   useEffect(() => {
     if (collectionId) {
+      const fetchFolders = async () => {
+        try {
+          const response = await fetch(`/api/collections/${collectionId}/folders`);
+          const data = await response.json();
+          setFolders(data.filter((f: Folder) => f.id !== folder.id));
+        } catch (error) {
+          console.error("Failed to get folders:", error);
+        }
+      };
       fetchFolders();
     }
-  }, [collectionId]);
+  }, [collectionId, folder.id]);
 
   useEffect(() => {
     if (folder && open) {
@@ -77,16 +86,6 @@ export function EditFolderDialog({
       });
     }
   }, [folder, open]);
-
-  const fetchFolders = async () => {
-    try {
-      const response = await fetch(`/api/collections/${collectionId}/folders`);
-      const data = await response.json();
-      setFolders(data.filter((f: Folder) => f.id !== folder.id));
-    } catch (error) {
-      console.error("Failed to get folders:", error);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

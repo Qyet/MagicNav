@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { BookmarkCard } from "./BookmarkCard";
 import { FolderCard } from "./FolderCard";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -21,12 +21,12 @@ interface BookmarkGridProps {
   pageSize?: number;
 }
 
-// 文件夹接口
-interface Folder {
+// 文件夹接口 - 暂时未使用，保留供将来使用
+/* interface Folder {
   id: string;
   name: string;
   icon?: string;
-}
+} */
 
 // 书签接口
 interface Bookmark {
@@ -104,13 +104,21 @@ export function BookmarkGrid({
 
   const routeToFolderInCollection = (collectionSlug: string, folderId?: string) => {
     const currentSearchParams = new URLSearchParams(searchParams.toString());
-    collectionSlug ? currentSearchParams.set("collection", collectionSlug) : currentSearchParams.delete("collection");
-    folderId ? currentSearchParams.set("folderId", folderId) : currentSearchParams.delete("folderId");
+    if (collectionSlug) {
+      currentSearchParams.set("collection", collectionSlug);
+    } else {
+      currentSearchParams.delete("collection");
+    }
+    if (folderId) {
+      currentSearchParams.set("folderId", folderId);
+    } else {
+      currentSearchParams.delete("folderId");
+    }
     router.push(`${pathname}?${currentSearchParams.toString()}`, { scroll: false });
   }
 
   // 获取书签和文件夹数据的异步函数
-  const fetchBookmarkData = async (folderId: string | null) => {
+  const fetchBookmarkData = useCallback(async (folderId: string | null) => {
     try {
       setLoading(true);
       
@@ -147,15 +155,14 @@ export function BookmarkGrid({
     } finally {
       setLoading(false);
     }
-  };
+  }, [collectionId, setBreadcrumbs, setCurrentBookmarks, setLoading, setSubfolders]);
 
   // 监听路由参数和刷新触发器变化
   useEffect(() => {
     if (collectionId) {
-
       fetchBookmarkData(currentFolderId);
     }
-  }, [collectionId, currentFolderId, refreshTrigger]); 
+  }, [collectionId, currentFolderId, refreshTrigger, fetchBookmarkData]); 
 
   // 处理文件夹点击事件
   const handleFolderNavigation = async (folderId: string | null) => {
@@ -222,20 +229,22 @@ export function BookmarkGrid({
     }
   };
 
-  // 调试用的副作用钩子，记录子文件夹信息
-  // useEffect(() => {
-  //   console.log("Subfolders:", subfolders);
-  //   subfolders.forEach(subfolder => {
-  //     console.log(`Folder ${subfolder.name}:`, {
-  //       id: subfolder.id,
-  //       items: subfolder.items.length,
-  //       bookmarks: subfolder.items.filter(item => item.type === 'bookmark').length,
-  //       bookmarkCount: subfolder.bookmarkCount,
-  //       rawData: subfolder,
-  //       allProps: Object.keys(subfolder)
-  //     });
-  //   });
-  // }, [subfolders]);
+  // 调试用的副作用钩子已被注释，未来可能需要用于调试
+  /* 
+  useEffect(() => {
+    console.log("Subfolders:", subfolders);
+    subfolders.forEach(subfolder => {
+      console.log(`Folder ${subfolder.name}:`, {
+        id: subfolder.id,
+        items: subfolder.items.length,
+        bookmarks: subfolder.items.filter(item => item.type === 'bookmark').length,
+        bookmarkCount: subfolder.bookmarkCount,
+        rawData: subfolder,
+        allProps: Object.keys(subfolder)
+      });
+    });
+  }, [subfolders]);
+  */
 
   // 加载搜索设置的副作用钩子
   useEffect(() => {

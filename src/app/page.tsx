@@ -19,7 +19,6 @@ function SearchParamsComponent() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const collectionSlug = searchParams.get("collection");
-
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCollectionId, setSelectedCollectionId] = useState<string>("");
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
@@ -30,13 +29,22 @@ function SearchParamsComponent() {
 
   const routeToFolderInCollection = (collection: Collection, folderId?: string | null) => {
     const currentSearchParams = new URLSearchParams(searchParams.toString());
-    collection?.slug ? currentSearchParams.set("collection", collection.slug) : currentSearchParams.delete("collection");
-    folderId ? currentSearchParams.set("folderId", folderId) : currentSearchParams.delete("folderId");
+    if (collection?.slug) {
+      currentSearchParams.set("collection", collection.slug);
+    } else {
+      currentSearchParams.delete("collection");
+    }
+    if (folderId) {
+      currentSearchParams.set("folderId", folderId);
+    } else {
+      currentSearchParams.delete("folderId");
+    }
     router.push(`${pathname}?${currentSearchParams.toString()}`);
   }
 
   useEffect(() => {
     const folderId = searchParams.get("folderId");
+    const collectionSlug = searchParams.get("collection");
     setCurrentFolderId(folderId);
 
     const fetchCollectionsAndSetDefault = async () => {
@@ -99,7 +107,7 @@ function SearchParamsComponent() {
         console.error("刷新数据失败:", error);
       }
     }
-  }, [selectedCollectionId, currentFolderId]);
+  }, [selectedCollectionId]);
 
   return (
     <div className="flex min-h-screen flex-col bg-background">

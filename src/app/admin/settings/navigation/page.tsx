@@ -247,7 +247,7 @@ const NavigationSettings = () => {
                   </div>
                 ) : (
                   <div className="text-center py-12 text-muted-foreground">
-                    <p>No menu items found. Click "Add Menu Item" to get started.</p>
+                    <p>No menu items found. Click &quot;Add Menu Item&quot; to get started.</p>
                   </div>
                 )}
 

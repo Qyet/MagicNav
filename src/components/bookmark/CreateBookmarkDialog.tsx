@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Link from "next/link";
+import Image from "next/image";
 import { Switch } from "@/components/ui/switch";
 import { Check, ChevronsUpDown, Folder } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -182,7 +183,7 @@ export function CreateBookmarkDialog({
     }
   };
 
-  const fetchFolders = async (collectionId: string) => {
+  const fetchFolders = useCallback(async (collectionId: string) => {
     try {
       const response = await fetch(`/api/collections/${collectionId}/folders?all=true`);
       const data = await response.json();
@@ -211,14 +212,14 @@ export function CreateBookmarkDialog({
     } catch (error) {
       console.error("Failed to fetch folders:", error);
     }
-  };
+  }, [setFolders]);
 
   // 修改folders获取的useEffect
   useEffect(() => {
     if (defaultCollectionId) {
       fetchFolders(defaultCollectionId);
     }
-  }, [defaultCollectionId]);
+  }, [defaultCollectionId, fetchFolders]);
 
   const isValidUrl = (url: string) => {
     try {
@@ -375,9 +376,11 @@ export function CreateBookmarkDialog({
                   </div>
                   {formData.icon && (
                     <div className="flex items-center">
-                      <img
+                      <Image
                         src={formData.icon}
                         alt="Icon preview"
+                        width={32}
+                        height={32}
                         className="w-8 h-8 object-contain"
                         onError={(e) => {
                           e.currentTarget.style.display = 'none';
@@ -399,14 +402,16 @@ export function CreateBookmarkDialog({
                           }`}
                           onClick={() => setFormData(prev => ({ ...prev, icon: iconUrl }))}
                         >
-                          <img
-                            src={iconUrl}
-                            alt={`Icon ${index + 1}`}
-                            className="w-6 h-6 object-contain mx-auto"
-                            onError={(e) => {
-                              (e.currentTarget.parentElement as HTMLElement).style.display = 'none';
-                            }}
-                          />
+                          <Image
+                          src={iconUrl}
+                          alt={`Icon ${index + 1}`}
+                          width={24}
+                          height={24}
+                          className="w-6 h-6 object-contain mx-auto"
+                          onError={(e) => {
+                            (e.currentTarget.parentElement as HTMLElement).style.display = 'none';
+                          }}
+                        />
                         </button>
                       ))}
                     </div>

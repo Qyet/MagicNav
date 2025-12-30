@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChevronRight, Folder } from "lucide-react";
@@ -43,31 +43,20 @@ export function FolderSidebar({
   onCollectionChange,
   collections
 }: FolderSidebarProps) {
-  // 如果没有集合，直接返回 null
-  if (!collections || !Array.isArray(collections) || collections.length === 0) {
-    return null;
-  }
-
+  const [loading, setLoading] = useState(false);
   const [folderTree, setFolderTree] = useState<FolderWithChildren[]>([]);
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (collectionId) {
-      fetchAllFolders();
-    }
-  }, [collectionId]);
-
-  const fetchAllFolders = async () => {
+  const fetchAllFolders = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/collections/${collectionId}/folders?all=true`);
       const data = await response.json();
       
-      // 构建完整的文件夹树
+      // Build folder tree
       const folderMap = new Map<string, FolderWithChildren>();
       
-      // 初始化所有节点
+      // Initialize nodes
       data.forEach((folder: Folder) => {
         folderMap.set(folder.id, { 
           ...folder, 
@@ -76,7 +65,7 @@ export function FolderSidebar({
         });
       });
       
-      // 构建树结构并按名称排序
+      // Build tree structure and sort by name
       const rootFolders: FolderWithChildren[] = [];
       data.forEach((folder: Folder) => {
         const node = folderMap.get(folder.id)!;
@@ -85,7 +74,6 @@ export function FolderSidebar({
           if (parent) {
             node.level = parent.level + 1;
             parent.children.push(node);
-            // 对子文件夹按名称排序
             parent.children.sort((a, b) => a.name.localeCompare(b.name));
           }
         } else {
@@ -93,15 +81,33 @@ export function FolderSidebar({
         }
       });
       
-      // 对根文件夹排序
       rootFolders.sort((a, b) => a.name.localeCompare(b.name));
       setFolderTree(rootFolders);
     } catch (error) {
-      console.error("Get folders failed:", error);
+      console.error("Failed to fetch folders:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [collectionId]);
+
+  useEffect(() => {
+    if (collectionId) {
+      fetchAllFolders();
+    }
+  }, [collectionId, fetchAllFolders]);
+
+  // 如果没有集合，直接返回 null
+  if (!collections || !Array.isArray(collections) || collections.length === 0) {
+    return null;
+  }
+
+  if (!collectionId) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <p className="text-muted-foreground">Select a collection</p>
+      </div>
+    );
+  }
 
   const toggleFolder = (folderId: string, e: React.MouseEvent) => {
     e.stopPropagation(); // 阻止事件冒泡

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -46,14 +46,7 @@ export function CreateFolderDialog({
     parentId: currentFolderId || "root",
   });
 
-  // 获取当前集合的所有文件夹
-  useEffect(() => {
-    if (collectionId) {
-      fetchFolders();
-    }
-  }, [collectionId]);
-
-  const fetchFolders = async () => {
+  const fetchFolders = useCallback(async () => {
     try {
       const response = await fetch(`/api/collections/${collectionId}/folders`);
       const data = await response.json();
@@ -61,7 +54,14 @@ export function CreateFolderDialog({
     } catch (error) {
       console.error("Failed to get folder.", error);
     }
-  };
+  }, [collectionId, setFolders]);
+
+  // 获取当前集合的所有文件夹
+  useEffect(() => {
+    if (collectionId) {
+      fetchFolders();
+    }
+  }, [collectionId, fetchFolders]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

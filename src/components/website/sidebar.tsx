@@ -25,12 +25,21 @@ interface Collection {
   slug: string;
 }
 
+interface Folder {
+  id: string;
+  name: string;
+  icon?: string;
+  parentId: string | null;
+}
+
 interface FolderNode {
   id: string;
   name: string;
   icon?: string;
   level: number;
   children: FolderNode[];
+  parentId?: string | null;
+  path?: string[];
 }
 
 interface WebsiteSidebarProps {
@@ -55,7 +64,7 @@ export function WebsiteSidebar({
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(
     new Set()
   );
-  const [folders, setFolders] = useState<any[]>([]);
+  const [folders, setFolders] = useState<Folder[]>([]);
   const [loading, setLoading] = useState(true);
 
   const { images, isLoading, error } = useSettingImages("logoUrl");
@@ -94,7 +103,7 @@ export function WebsiteSidebar({
       }
     };
     fetchCollections();
-  }, [session]);
+  }, [session, onCollectionChange, selectedCollectionId]);
 
   // 获取文件夹树
   useEffect(() => {
@@ -147,8 +156,8 @@ export function WebsiteSidebar({
     }
   }, [currentFolderId, folders]);
 
-  const buildFolderTree = (folders: any[]): FolderNode[] => {
-    const folderMap = new Map();
+  const buildFolderTree = (folders: Folder[]): FolderNode[] => {
+    const folderMap = new Map<string, FolderNode>();
 
     // 第一步：创建所有节点的映射
     folders.forEach((folder) => {
@@ -195,16 +204,18 @@ export function WebsiteSidebar({
     const rootFolders: FolderNode[] = [];
     folders.forEach((folder) => {
       const node = folderMap.get(folder.id);
-      if (folder.parentId) {
-        const parent = folderMap.get(folder.parentId);
-        if (parent) {
-          parent.children.push(node);
+      if (node) {
+        if (folder.parentId) {
+          const parent = folderMap.get(folder.parentId);
+          if (parent) {
+            parent.children.push(node);
+          } else {
+            // 如果找不到父文件夹，作为根文件夹处理
+            rootFolders.push(node);
+          }
         } else {
-          // 如果找不到父文件夹，作为根文件夹处理
           rootFolders.push(node);
         }
-      } else {
-        rootFolders.push(node);
       }
     });
 

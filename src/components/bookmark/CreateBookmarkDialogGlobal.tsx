@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Link from "next/link";
+import Image from "next/image";
 import { Switch } from "@/components/ui/switch";
 import { Check, ChevronsUpDown, Folder } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -93,6 +94,48 @@ export default function CreateBookmarkDialogGlobal({
 
   // 添加 availableIcons 状态
   const [availableIcons, setAvailableIcons] = useState<string[]>([]);
+  const [popoverOpen, setPopoverOpen] = useState(false);
+
+  const fetchCollections = useCallback(async () => {
+    try {
+      const response = await fetch("/api/collections");
+      const data = await response.json();
+      setCollections(data);
+    } catch (error) {
+      console.error("Failed to fetch collections:", error);
+    }
+  }, [setCollections]);
+
+  const fetchFolders = useCallback(async (collectionId: string) => {
+    try {
+      const response = await fetch(`/api/collections/${collectionId}/folders?all=true`);
+      const data = await response.json();
+      
+      // 指定 Map 的类型
+      const folderMap = new Map<string, Folder>(data.map((folder: Folder) => [folder.id, folder]));
+      
+      // 处理文件夹数据，添加完整路径显示
+      const processedFolders = data.map((folder: Folder) => {
+        const path: string[] = [];
+        let current: Folder | null = folder;
+        
+        // 递归构建完整路径
+        while (current) {
+          path.unshift(current.name);
+          current = current.parentId ? folderMap.get(current.parentId) || null : null;
+        }
+        
+        return {
+          ...folder,
+          displayName: path.join(" / ")
+        };
+      });
+      
+      setFolders(processedFolders);
+    } catch (error) {
+      console.error("Failed to fetch folders:", error);
+    }
+  }, [setFolders]);
 
   // 修改 useEffect，当对话框关闭时重置所有状态
   useEffect(() => {
@@ -116,14 +159,14 @@ export default function CreateBookmarkDialogGlobal({
   // 初始化时获取集合列表
   useEffect(() => {
     fetchCollections();
-  }, []);
+  }, [fetchCollections]);
 
   // 当 collectionId 变化时获取文件夹列表
   useEffect(() => {
     if (formData.collectionId) {
       fetchFolders(formData.collectionId);
     }
-  }, [formData.collectionId]);
+  }, [formData.collectionId, fetchFolders]);
 
   // 当默认值改变时更新表单
   useEffect(() => {
@@ -147,8 +190,7 @@ export default function CreateBookmarkDialogGlobal({
     }
   }, [defaultFolderId, folders]);
 
-  // 在组件内部，我们将使用 props 中的 open 和 onOpenChange，而不是创建新的状态
-  const [popoverOpen, setPopoverOpen] = useState(false);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -192,47 +234,6 @@ export default function CreateBookmarkDialogGlobal({
       setError("Create bookmark failed, please try again");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchCollections = async () => {
-    try {
-      const response = await fetch("/api/collections");
-      const data = await response.json();
-      setCollections(data);
-    } catch (error) {
-      console.error("Failed to fetch collections:", error);
-    }
-  };
-
-  const fetchFolders = async (collectionId: string) => {
-    try {
-      const response = await fetch(`/api/collections/${collectionId}/folders?all=true`);
-      const data = await response.json();
-      
-      // 指定 Map 的类型
-      const folderMap = new Map<string, Folder>(data.map((folder: Folder) => [folder.id, folder]));
-      
-      // 处理文件夹数据，添加完整路径显示
-      const processedFolders = data.map((folder: Folder) => {
-        const path: string[] = [];
-        let current: Folder | null = folder;
-        
-        // 递归构建完整路径
-        while (current) {
-          path.unshift(current.name);
-          current = current.parentId ? folderMap.get(current.parentId) || null : null;
-        }
-        
-        return {
-          ...folder,
-          displayName: path.join(" / ")
-        };
-      });
-      
-      setFolders(processedFolders);
-    } catch (error) {
-      console.error("Failed to fetch folders:", error);
     }
   };
 
@@ -413,9 +414,11 @@ export default function CreateBookmarkDialogGlobal({
                   </div>
                   {formData.icon && (
                     <div className="flex items-center">
-                      <img
+                      <Image
                         src={formData.icon}
                         alt="Icon preview"
+                        width={32}
+                        height={32}
                         className="w-8 h-8 object-contain"
                         onError={(e) => {
                           e.currentTarget.style.display = 'none';
@@ -437,14 +440,16 @@ export default function CreateBookmarkDialogGlobal({
                           }`}
                           onClick={() => setFormData(prev => ({ ...prev, icon: iconUrl }))}
                         >
-                          <img
-                            src={iconUrl}
-                            alt={`Icon ${index + 1}`}
-                            className="w-6 h-6 object-contain mx-auto"
-                            onError={(e) => {
-                              (e.currentTarget.parentElement as HTMLElement).style.display = 'none';
-                            }}
-                          />
+                          <Image
+                          src={iconUrl}
+                          alt={`Icon ${index + 1}`}
+                          width={24}
+                          height={24}
+                          className="w-6 h-6 object-contain mx-auto"
+                          onError={(e) => {
+                            (e.currentTarget.parentElement as HTMLElement).style.display = 'none';
+                          }}
+                        />
                         </button>
                       ))}
                     </div>

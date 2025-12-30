@@ -16,7 +16,7 @@ export async function POST(
     // Removed restriction: allow creating multiple collections
 
     let targetCollection;
-    let insideFolderMap: { [key: string]: string }[] = folderMap || [];
+    const insideFolderMap: { [key: string]: string }[] = folderMap || [];
 
     // Handle collection (create new or use existing)
     if (collectionId) {
