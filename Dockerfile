@@ -2,24 +2,30 @@ FROM node:18-alpine
 
 WORKDIR /app
 
+# Set timezone
+ENV TZ=Asia/Shanghai
+
 # Install dependencies
 COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
 RUN \
-  if [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i --frozen-lockfile; \
-  elif [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-  else npm install; \
+  if [ -f package-lock.json ]; then npm ci --only=production; \
+  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i --frozen-lockfile --prod; \
+  elif [ -f yarn.lock ]; then yarn --frozen-lockfile --production; \
+  else npm install --only=production; \
   fi
 
-# Copy all files
+# Copy source files
 COPY . .
 
-# Generate Prisma Client
+# Generate Prisma Client (safe in build time)
 RUN npx prisma generate
 
-# Build the application
+# Build application
 ENV NODE_ENV=production
 RUN npm run build
+
+# Clean up development dependencies
+RUN npm prune --production
 
 # Expose port
 EXPOSE 3000
