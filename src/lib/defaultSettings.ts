@@ -31,7 +31,7 @@ export const defaultSettings: SettingItem[] = [
   },
   {
     key: "copyrightText",
-    value: "© 2025 MagicNav. All rights reserved."},{
+    value: "© 2025 MagicNav. All rights reserved.",
     type: "string",
     group: "basic",
     description: "版权信息"
