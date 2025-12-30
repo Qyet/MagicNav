@@ -12,9 +12,8 @@ services:
       - "5432:5432"
 
   magicnav:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: node:18-bullseye
+    command: sh -c "npm install && npm run build && npm start"
     restart: unless-stopped
     ports:
       - "3000:3000"
