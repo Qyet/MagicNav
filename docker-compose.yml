@@ -1,0 +1,32 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: magicnav
+      POSTGRES_USER: magicnav
+      POSTGRES_PASSWORD: magicnav123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  magicnav:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgresql://magicnav:magicnav123@postgres:5432/magicnav?schema=public"
+      NEXTAUTH_SECRET: "your-nexauth-secret-here"
+      NEXTAUTH_URL: "http://localhost:3000"
+      ADMIN_EMAIL: "admin@localhost"
+      ADMIN_PASSWORD: "admin123"
+      NEXT_PUBLIC_APP_URL: "http://localhost:3000"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
