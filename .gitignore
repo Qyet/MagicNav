@@ -67,10 +67,7 @@ pids
 # Yarn Integrity file
 .yarn-integrity
 
-# Docker files
-docker-compose.yml
-docker-compose.override.yml
-Dockerfile
+
 
 # Editor directories and files
 .vscode/*

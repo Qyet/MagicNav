@@ -165,7 +165,9 @@ export default function BasicSettingsPage() {
               youtubeUrl: settings.youtubeUrl,
               linkedinUrl: settings.linkedinUrl,
               pinterestUrl: settings.pinterestUrl,
-              telegramUrl: settings.telegramUrl
+              telegramUrl: settings.telegramUrl,
+              behanceUrl: settings.behanceUrl,
+              dribbbleUrl: settings.dribbbleUrl
             };
           default:
             return {};
