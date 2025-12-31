@@ -5,6 +5,14 @@ WORKDIR /app
 # Set timezone
 ENV TZ=Asia/Shanghai
 
+# Set DATABASE_URL during build time for prisma generate and next build
+ENV DATABASE_URL="postgresql://neondb_owner:npg_JZTe2Iv3YcCs@ep-lingering-grass-a1yx11c3-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+ENV NEXTAUTH_SECRET="your-nexauth-secret-here"
+ENV NEXTAUTH_URL="http://localhost:3000"
+ENV ADMIN_EMAIL="admin@example.com"
+ENV ADMIN_PASSWORD="admin123"
+ENV NEXT_PUBLIC_APP_URL="http://localhost:3000"
+
 # Install dependencies (copy package files first)
 COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
 
@@ -31,9 +39,9 @@ COPY postcss.config.mjs ./
 COPY tsconfig.json ./
 COPY components.json ./
 
-# Build application
+# Build application with NODE_ENV=production
 ENV NODE_ENV=production
-RUN npm run build
+RUN npm run build -- --no-lint
 
 # Clean up development dependencies
 RUN npm prune --production

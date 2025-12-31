@@ -22,8 +22,7 @@ services:
       NEXTAUTH_URL: "http://localhost:3000"
       ADMIN_EMAIL: "admin@localhost"
       ADMIN_PASSWORD: "admin123"
-      NEXT_PUBLIC_APP_URL: "http://localhost:3000"
-    depends_on:
+      NEXT_PUBLIC_APP_URL: "http://localhost:3000"    depends_on:
       - postgres
 
 volumes:
