@@ -38,12 +38,6 @@ const nextConfig = {
   generateBuildId: async () => {
     return 'build-' + Date.now();
   },
-  // 禁用静态导出，确保所有页面在运行时渲染
-  exportPathMap: async function () {
-    return {
-      '/': { page: '/' },
-    };
-  },
 };
 
 export default nextConfig;
