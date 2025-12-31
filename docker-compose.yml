@@ -9,21 +9,21 @@ services:
     build: .
     ports:
       - "3000:3000"  # 主机端口:容器端口
+    # 注意：YAML 语法要求 environment 字段可以使用两种格式：
+    # 1. 映射格式（推荐）：使用 KEY: VALUE 格式
+    # 2. 序列格式：使用 - KEY=VALUE 格式
+    # 以下使用映射格式，避免 YAML 解析错误
     environment:
-      ########################################################
       # 必填环境变量 - 用户必须替换以下值
-      ########################################################
-      - NODE_ENV=production
-      - NEXTAUTH_URL=http://localhost:3000  # 替换为你的域名，如 https://magicnav.example.com
-      - NEXTAUTH_SECRET=your_nextauth_secret_here  # 生成一个随机字符串，用于加密会话
-      - DATABASE_URL=postgresql://user:password@host:5432/database  # 替换为你的数据库连接 URL
+      NODE_ENV: production
+      NEXTAUTH_URL: https://maiju.tech
+      NEXTAUTH_SECRET: pk_XMRLa6d_THicc0IUVsTg1A
+      DATABASE_URL: "postgresql://neondb_owner:npg_JZTe2Iv3YcCs@ep-lingering-grass-a1yx11c3-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
       
-      ########################################################
       # 可选环境变量 - 根据需要填写
-      ########################################################
-      - NEXT_PUBLIC_APP_URL=http://localhost:3000  # 替换为你的域名
-      - NEXT_PUBLIC_GOOGLE_ANALYTICS_ID=  # 可选，Google Analytics ID
-      - NEXT_PUBLIC_CLARITY_ID=  # 可选，Microsoft Clarity ID
+      NEXT_PUBLIC_APP_URL: https://maiju.tech
+      NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: ""
+      NEXT_PUBLIC_CLARITY_ID: ""
     restart: unless-stopped
     depends_on:
       - db  # 如果使用外部数据库，可以删除此行
@@ -38,12 +38,10 @@ services:
     ports:
       - "5432:5432"  # 主机端口:容器端口
     environment:
-      ########################################################
       # 数据库环境变量 - 用户必须替换以下值
-      ########################################################
-      - POSTGRES_USER=your_db_user  # 替换为你的数据库用户名
-      - POSTGRES_PASSWORD=your_db_password  # 替换为你的数据库密码
-      - POSTGRES_DB=your_db_name  # 替换为你的数据库名称
+      POSTGRES_USER: your_db_user  # 替换为你的数据库用户名
+      POSTGRES_PASSWORD: your_db_password  # 替换为你的数据库密码
+      POSTGRES_DB: your_db_name  # 替换为你的数据库名称
     volumes:
       - postgres_data:/var/lib/postgresql/data  # 持久化数据库数据
     restart: unless-stopped

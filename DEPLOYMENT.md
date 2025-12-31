@@ -23,14 +23,21 @@
 
 ### 1. 配置环境变量
 
-编辑 `docker-compose.yml` 文件，根据您的实际情况修改以下环境变量：
+编辑 `docker-compose.yml` 文件，根据您的实际情况修改以下环境变量。**请严格遵守 YAML 语法规则**：
+
+#### YAML 语法注意事项
+1. **不要使用反引号**：YAML 只支持单引号 `'` 或双引号 `"`
+2. **特殊字符必须用引号括起来**：包含 `&`, `$`, `#`, `?` 等特殊字符的值必须用引号括起来
+3. **每行格式**：每行必须以 `-` 开头，后面跟着 `KEY=VALUE` 格式
+4. **注释格式**：注释必须以 `#` 开头，且不能与环境变量在同一行
+5. **缩进**：使用空格缩进，不要使用制表符
 
 #### 必填环境变量
 ```yaml
 # 应用服务环境变量
-- NEXTAUTH_URL=http://your-domain.com  # 替换为您的域名或 IP 地址，如 https://magicnav.example.com
+- NEXTAUTH_URL=https://your-domain.com  # 替换为您的域名或 IP 地址
 - NEXTAUTH_SECRET=your_nextauth_secret_here  # 生成一个随机字符串，用于加密会话
-- DATABASE_URL=postgresql://user:password@host:5432/database  # 数据库连接 URL
+- DATABASE_URL="postgresql://user:password@host:5432/database"  # 包含特殊字符的值必须用引号括起来
 
 # 如果使用内置 PostgreSQL 数据库，还需要修改：
 - POSTGRES_USER=your_db_user  # 数据库用户名
