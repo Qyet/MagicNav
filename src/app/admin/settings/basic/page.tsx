@@ -57,6 +57,8 @@ export default function BasicSettingsPage() {
     linkedinUrl: "",
     pinterestUrl: "",
     telegramUrl: "",
+    behanceUrl: "",
+    dribbbleUrl: "",
     copyrightText: "",
     contactEmail: "",
     googleAnalyticsId: "",
