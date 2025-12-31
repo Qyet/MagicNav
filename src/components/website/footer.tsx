@@ -33,14 +33,24 @@ export function Footer() {
       label: 'WeChat'
     },
     {
+      key: 'behanceUrl',
+      icon: 'ri-behance-fill',
+      label: 'Behance'
+    },
+    {
+      key: 'dribbbleUrl',
+      icon: 'ri-dribbble-fill',
+      label: 'Dribbble'
+    },
+    {
+      key: 'pinterestUrl',
+      icon: 'ri-pinterest-fill',
+      label: 'Pinterest'
+    },
+    {
       key: 'githubUrl',
       icon: 'ri-github-fill',
       label: 'GitHub'
-    },
-    {
-      key: 'twitterUrl',
-      icon: 'ri-twitter-x-fill',
-      label: 'Twitter'
     },
     {
       key: 'discordUrl',
@@ -48,9 +58,39 @@ export function Footer() {
       label: 'Discord'
     },
     {
+      key: 'twitterUrl',
+      icon: 'ri-twitter-x-fill',
+      label: 'Twitter/X'
+    },
+    {
+      key: 'telegramUrl',
+      icon: 'ri-telegram-fill',
+      label: 'Telegram'
+    },
+    {
+      key: 'linkedinUrl',
+      icon: 'ri-linkedin-fill',
+      label: 'LinkedIn'
+    },
+    {
       key: 'youtubeUrl',
       icon: 'ri-youtube-fill',
       label: 'YouTube'
+    },
+    {
+      key: 'bilibiliUrl',
+      icon: 'ri-bilibili-fill',
+      label: 'Bilibili'
+    },
+    {
+      key: 'weiboUrl',
+      icon: 'ri-weibo-fill',
+      label: 'Weibo'
+    },
+    {
+      key: 'zhihuUrl',
+      icon: 'ri-zhihu-fill',
+      label: 'Zhihu'
     }
   ];
 

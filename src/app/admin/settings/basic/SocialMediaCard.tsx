@@ -10,16 +10,18 @@ import {
 
   interface Settings {
     weixinUrl?: string;
-    githubUrl?: string;
-    twitterUrl?: string;
-    discordUrl?: string;
-    youtubeUrl?: string;
+    behanceUrl?: string;
+    dribbbleUrl?: string;
     pinterestUrl?: string;
-    weiboUrl?: string;
-    bilibiliUrl?: string;
-    zhihuUrl?: string;
+    githubUrl?: string;
+    discordUrl?: string;
+    twitterUrl?: string;
     telegramUrl?: string;
     linkedinUrl?: string;
+    youtubeUrl?: string;
+    bilibiliUrl?: string;
+    weiboUrl?: string;
+    zhihuUrl?: string;
     [key: string]: string | undefined;
   }
 
@@ -31,26 +33,16 @@ import {
     handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   }) => {
     const socialLinks = [
-      { id: "weixinUrl", label: "WeChat Official Account Link", placeholder: "WeChat Official Account Link" },
+      { id: "weixinUrl", label: "WeChat Official Account Link", placeholder: "WeChat Official Account Link", description: "Supports official account QR code image (150px*150px)" },
       {
-        id: "githubUrl",
-        label: "GitHub URL",
-        placeholder: "https://github.com/yourusername",
+        id: "behanceUrl",
+        label: "Behance URL",
+        placeholder: "https://behance.net/yourusername",
       },
       {
-        id: "twitterUrl",
-        label: "Twitter URL",
-        placeholder: "https://twitter.com/yourusername",
-      },
-      {
-        id: "discordUrl",
-        label: "Discord URL",
-        placeholder: "https://discord.gg/yourserver",
-      },
-      {
-        id: "youtubeUrl",
-        label: "YouTube Channel Link",
-        placeholder: "https://youtube.com/c/yourchannel",
+        id: "dribbbleUrl",
+        label: "Dribbble URL",
+        placeholder: "https://dribbble.com/yourusername",
       },
       {
         id: "pinterestUrl",
@@ -58,19 +50,19 @@ import {
         placeholder: "https://pinterest.com/yourusername",
       },
       {
-        id: "weiboUrl",
-        label: "Weibo Homepage Link",
-        placeholder: "https://weibo.com/yourpage",
+        id: "githubUrl",
+        label: "GitHub URL",
+        placeholder: "https://github.com/yourusername",
       },
       {
-        id: "bilibiliUrl",
-        label: "Bilibili Homepage Link",
-        placeholder: "https://space.bilibili.com/yourpage",
+        id: "discordUrl",
+        label: "Discord URL",
+        placeholder: "https://discord.gg/yourserver",
       },
       {
-        id: "zhihuUrl",
-        label: "Zhihu Homepage Link",
-        placeholder: "https://zhihu.com/people/yourpage",
+        id: "twitterUrl",
+        label: "Twitter/X URL",
+        placeholder: "https://twitter.com/yourusername",
       },
       {
         id: "telegramUrl",
@@ -82,6 +74,26 @@ import {
         label: "LinkedIn URL",
         placeholder: "https://linkedin.com/in/yourprofile",
       },
+      {
+        id: "youtubeUrl",
+        label: "YouTube Channel Link",
+        placeholder: "https://youtube.com/c/yourchannel",
+      },
+      {
+        id: "bilibiliUrl",
+        label: "Bilibili Homepage Link",
+        placeholder: "https://space.bilibili.com/yourpage",
+      },
+      {
+        id: "weiboUrl",
+        label: "Weibo Homepage Link",
+        placeholder: "https://weibo.com/yourpage",
+      },
+      {
+        id: "zhihuUrl",
+        label: "Zhihu Homepage Link",
+        placeholder: "https://zhihu.com/people/yourpage",
+      },
     ];
   
     return (
@@ -91,9 +103,12 @@ import {
           <CardDescription>Set the social media links displayed in the footer of your website</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 p-6">
-          {socialLinks.map(({ id, label, placeholder }) => (
+          {socialLinks.map(({ id, label, placeholder, description }) => (
             <div key={id} className="grid gap-2">
               <Label htmlFor={id}>{label}</Label>
+              {description && (
+                <p className="text-xs text-muted-foreground">{description}</p>
+              )}
               <Input
                 id={id}
                 name={id}

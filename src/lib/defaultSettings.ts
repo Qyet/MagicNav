@@ -54,6 +54,34 @@ export const defaultSettings: SettingItem[] = [
 
   // 社交媒体链接
   {
+    key: "weixinUrl",
+    value: "",
+    type: "string",
+    group: "basic",
+    description: "微信公众号链接"
+  },
+  {
+    key: "behanceUrl",
+    value: "https://www.behance.net/magictechdesigner",
+    type: "string",
+    group: "basic",
+    description: "Behance链接"
+  },
+  {
+    key: "dribbbleUrl",
+    value: "",
+    type: "string",
+    group: "basic",
+    description: "Dribbble链接"
+  },
+  {
+    key: "pinterestUrl",
+    value: "https://pinterest.com/magictechdesigner/",
+    type: "string",
+    group: "basic",
+    description: "Pinterest链接"
+  },
+  {
     key: "githubUrl",
     value: "https://github.com/Qyet/MagicNav",
     type: "string",
@@ -62,56 +90,56 @@ export const defaultSettings: SettingItem[] = [
   },
   {
     key: "discordUrl",
-    value: "https://discord.gg/gJTrkHFg",
+    value: "",
     type: "string",
     group: "basic",
     description: "Discord链接"
   },
   {
     key: "twitterUrl",
-    value: "https://x.com/Qyet",
+    value: "",
     type: "string",
     group: "basic",
-    description: "Twitter链接"
+    description: "Twitter/X链接"
   },
   {
-    key: "youtubeUrl",
-    value: "https://www.youtube.com/channel/Qyet",
+    key: "telegramUrl",
+    value: "",
     type: "string",
     group: "basic",
-    description: "YouTube频道链接"
+    description: "Telegram链接"
   },
   {
     key: "linkedinUrl",
-    value: "https://linkedin.com/company/yourcompany",
+    value: "",
     type: "string",
     group: "basic",
     description: "LinkedIn链接"
   },
   {
-    key: "weixinUrl",
-    value: "https://weixin.qq.com/Qyet",
+    key: "youtubeUrl",
+    value: "",
     type: "string",
     group: "basic",
-    description: "微信公众号链接"
-  },
-  {
-    key: "weiboUrl",
-    value: "https://weibo.com/Qyet",
-    type: "string",
-    group: "basic",
-    description: "微博主页链接"
+    description: "YouTube频道链接"
   },
   {
     key: "bilibiliUrl",
-    value: "https://dribbble.com/Qyet",
+    value: "",
     type: "string",
     group: "basic",
     description: "B站主页链接"
   },
   {
+    key: "weiboUrl",
+    value: "",
+    type: "string",
+    group: "basic",
+    description: "微博主页链接"
+  },
+  {
     key: "zhihuUrl",
-    value: "https://zhihu.com/people/Qyet",
+    value: "",
     type: "string",
     group: "basic",
     description: "知乎主页链接"

@@ -28,15 +28,10 @@ const nextConfig = {
     missingSuspenseWithCSRBailout: false,
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   eslint: {
     ignoreDuringBuilds: true,
-  },
-  // 配置所有页面为动态渲染，避免构建时执行数据库查询
-  staticPageGenerationTimeout: 120,
-  generateBuildId: async () => {
-    return 'build-' + Date.now();
   },
 };
 
