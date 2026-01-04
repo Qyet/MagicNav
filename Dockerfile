@@ -1,14 +1,16 @@
 # MagicNav Dockerfile
 # 用于构建和运行 MagicNav 应用
 
-# 使用 Node.js 20 Alpine 镜像作为构建基础
-FROM node:20-alpine AS builder
+# 使用 Node.js 20 Slim 镜像作为构建基础（基于 Debian，对 Prisma 引擎更兼容）
+FROM node:20-slim AS builder
 
 # 设置工作目录
 WORKDIR /app
 
-# 安装必要的系统依赖，包括 Prisma 引擎所需的 libssl.so.1.1
-RUN apk add --no-cache openssl1.1-compat ca-certificates
+# 安装必要的系统依赖（基于 Debian，更适合 Prisma 引擎）
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
 # 优化依赖安装：仅复制 package.json 和 package-lock.json 先安装依赖
 COPY package*.json ./
@@ -28,14 +30,16 @@ RUN npx prisma generate
 # 构建应用
 RUN npm run build
 
-# 使用更小的 Node.js 20 Alpine 镜像作为运行基础
-FROM node:20-alpine AS runner
+# 使用 Node.js 20 Slim 镜像作为运行基础（基于 Debian，对 Prisma 引擎更兼容）
+FROM node:20-slim AS runner
 
 # 设置工作目录
 WORKDIR /app
 
-# 安装必要的系统依赖，包括 Prisma 引擎所需的 libssl.so.1.1
-RUN apk add --no-cache openssl1.1-compat ca-certificates
+# 安装必要的系统依赖（基于 Debian，更适合 Prisma 引擎）
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
 # 复制构建产物
 COPY --from=builder /app/.next ./.next
