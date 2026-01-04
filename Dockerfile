@@ -1,11 +1,14 @@
 # MagicNav Dockerfile
 # 用于构建和运行 MagicNav 应用
 
-# 使用 Node.js 20 Alpine 镜像作为构建基础（更现代的版本）
+# 使用 Node.js 20 Alpine 镜像作为构建基础
 FROM node:20-alpine AS builder
 
 # 设置工作目录
 WORKDIR /app
+
+# 安装必要的系统依赖，包括 Prisma 引擎所需的 libssl.so.1.1
+RUN apk add --no-cache openssl1.1-compat ca-certificates
 
 # 优化依赖安装：仅复制 package.json 和 package-lock.json 先安装依赖
 COPY package*.json ./
@@ -31,12 +34,16 @@ FROM node:20-alpine AS runner
 # 设置工作目录
 WORKDIR /app
 
+# 安装必要的系统依赖，包括 Prisma 引擎所需的 libssl.so.1.1
+RUN apk add --no-cache openssl1.1-compat ca-certificates
+
 # 复制构建产物
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.js ./
+COPY --from=builder /app/prisma ./prisma
 
 # 环境变量说明：
 # - 用户部署时需要根据实际情况替换这些值
