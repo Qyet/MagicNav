@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # ===============================
+  # 初始化服务（自动创建.env文件）
+  # ===============================
+  init:
+    image: alpine:latest
+    container_name: magicnav-init
+    command: >
+      sh -c 'if [ ! -f /app/.env ]; then 
+        cp /app/.env.example /app/.env; 
+        # 生成随机NextAuth密钥
+        NEXTAUTH_SECRET=$(uuidgen); 
+        sed -i "s/\[YOUR_NEXTAUTH_SECRET\]/$NEXTAUTH_SECRET/g" /app/.env; 
+        echo "Created .env file from .env.example with random NextAuth secret"; 
+        echo "Please update DATABASE_URL in .env file with your remote database connection string"; 
+      else 
+        echo ".env file already exists"; 
+      fi'
+    volumes:
+      - ./:/app
+    restart: "no"
+    networks:
+      - magicnav-network
+
+  # ===============================
+  # MagicNav应用服务（核心服务）
+  # ===============================
+  app:
+    build: .
+    container_name: magicnav-app
+    restart: always
+    ports:
+      - "3000:3000"
+    # 使用环境变量文件
+    env_file:
+      - .env
+    environment:
+      # 数据库连接URL（远程模式）
+      # - 请直接在.env文件中配置完整的DATABASE_URL
+      # - 示例：DATABASE_URL="postgresql://username:password@hostname:port/database?schema=public"
+      - DATABASE_URL=${DATABASE_URL}
+      # NextAuth认证配置
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
+      # 管理员配置
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@example.com}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin123}
+      # 应用URL配置
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+      # logo.dev API Key（可选）
+      - LOGO_DEV_API_KEY=${LOGO_DEV_API_KEY}
+    # 依赖初始化服务（不依赖本地数据库）
+    depends_on:
+      - init
+    networks:
+      - magicnav-network
+
+# ===============================
+# 网络配置
+# ===============================
+networks:
+  magicnav-network:
+    name: magicnav-network
+    driver: bridge
