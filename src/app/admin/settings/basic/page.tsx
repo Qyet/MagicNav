@@ -57,6 +57,8 @@ export default function BasicSettingsPage() {
     linkedinUrl: "",
     pinterestUrl: "",
     telegramUrl: "",
+    behanceUrl: "",
+    dribbbleUrl: "",
     copyrightText: "",
     contactEmail: "",
     googleAnalyticsId: "",
@@ -145,7 +147,7 @@ export default function BasicSettingsPage() {
           case "statistics":
             return {
               googleAnalyticsId: settings.googleAnalyticsId,
-              clarityId: settings.clarityId
+              clarityId: settings.clarityId,
             };
           case "footerSettings":
             return {

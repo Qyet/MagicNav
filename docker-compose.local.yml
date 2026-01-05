@@ -2,12 +2,19 @@ version: '3.8'
 
 services:
   # ===============================
-  # 初始化服务（自动创建.env文件）
+  # MagicNav应用服务（核心服务）
   # ===============================
-  init:
-    image: alpine:latest
-    container_name: magicnav-init
-    command: >
+  app:
+    build: .
+    container_name: magicnav-app
+    restart: always
+    ports:
+      - "3000:3000"
+    # 使用环境变量文件
+    env_file:
+      - .env
+    # 初始化脚本：检查并生成.env文件
+    entrypoint: >
       sh -c 'if [ ! -f /app/.env ]; then 
         cp /app/.env.example /app/.env; 
         # 生成随机密码（使用uuidgen的前12个字符，足够安全且便于记忆）
@@ -20,25 +27,9 @@ services:
         echo "Database password: $RANDOM_PASSWORD"; 
       else 
         echo ".env file already exists"; 
-      fi'
-    volumes:
-      - ./:/app
-    restart: "no"
-    networks:
-      - magicnav-network
-
-  # ===============================
-  # MagicNav应用服务（核心服务）
-  # ===============================
-  app:
-    build: .
-    container_name: magicnav-app
-    restart: always
-    ports:
-      - "3000:3000"
-    # 使用环境变量文件
-    env_file:
-      - .env
+      fi; 
+      exec "$@"'
+      sh
     environment:
       # 数据库连接配置（本地数据库模式使用）
       - POSTGRES_USER=${POSTGRES_USER:-magicnav}
@@ -57,9 +48,8 @@ services:
       - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
       # logo.dev API Key（可选）
       - LOGO_DEV_API_KEY=${LOGO_DEV_API_KEY}
-    # 依赖初始化服务和本地数据库服务
+    # 依赖本地数据库服务
     depends_on:
-      - init
       - db
     networks:
       - magicnav-network
