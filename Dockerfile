@@ -7,8 +7,10 @@ WORKDIR /app
 # 安装必要的系统依赖（基于 Debian，更适合 Prisma 引擎）
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
+    build-essential \
+    libssl-dev \
+    uuid-runtime \
     && rm -rf /var/lib/apt/lists/*
-
 # 优化依赖安装：仅复制 package.json 和 package-lock.json 先安装依赖
 COPY package*.json ./
 
@@ -45,7 +47,7 @@ COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.js ./
 COPY --from=builder /app/prisma ./prisma
-
+COPY --from=builder /app/.env.example ./
 # 暴露端口
 EXPOSE 3000
 
