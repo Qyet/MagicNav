@@ -35,9 +35,53 @@ export const generateMetadata = async (
   parent: ResolvingMetadata
 ): Promise<Metadata> => {
   try {
-    const tableExists = await checkSiteSettingTableExists();
+    // 检查是否处于构建阶段，构建时跳过数据库访问
+    const isBuilding = process.env.NEXT_PHASE === 'phase-production-build';
+    
+    // 使用默认设置的字段
     const keys = ["websiteName", "description", "keywords", "siteUrl", "faviconUrl", "ogImage"];
     
+    // 构建时直接使用默认设置
+    if (isBuilding) {
+      // 从默认设置中筛选需要的字段
+      const siteSettings = defaultSettings.filter((setting) =>
+        keys.includes(setting.key)
+      ).map(setting => ({
+        key: setting.key,
+        value: setting.value
+      }));
+      
+      // 直接使用默认设置构建元数据
+      const settingsMap = siteSettings.reduce((acc: Record<string, string>, setting) => {
+        acc[setting.key] = setting.value || "";
+        return acc;
+      }, {} as Record<string, string>);
+
+      const siteUrl = settingsMap.siteUrl || "http://localhost:3000";
+      const faviconUrl = '/favicon/favicon.ico';
+
+      return {
+        title: settingsMap.websiteName,
+        description: settingsMap.description,
+        keywords: settingsMap.keywords,
+        metadataBase: new URL(siteUrl),
+        alternates: {
+          canonical: siteUrl,
+        },
+        icons: {
+          icon: [
+            {
+              url: faviconUrl,
+              sizes: "32x32",
+              type: "image/x-icon",
+            },
+          ],
+        },
+      };
+    }
+    
+    // 非构建阶段正常访问数据库
+    const tableExists = await checkSiteSettingTableExists();
     let siteSettings: Array<{ id?: string; key: string; value: string | null }>;
     if (tableExists) {
       siteSettings = await prisma.siteSetting.findMany({
@@ -173,24 +217,36 @@ export default async function RootLayout({
     clarityId: "",
   };
 
-  if (process.env.NODE_ENV === "production") {
-    const tableExists = await checkSiteSettingTableExists();
-    if (tableExists) {
-      // 获取统计代码ID
-      const analytics = await prisma.siteSetting.findMany({
-        where: {
-          key: {
-            in: ["googleAnalyticsId", "clarityId"],
-          },
-        },
-      });
+  // 检查是否处于构建阶段，构建时跳过数据库访问
+  const isBuilding = process.env.NEXT_PHASE === 'phase-production-build';
 
-      if (analytics.length > 0) {
-        analyticsMap = analytics.reduce((acc: AnalyticsMap, setting) => {
-          acc[setting.key] = setting.value || "";
-          return acc;
-        }, { ...analyticsMap });
+  if (process.env.NODE_ENV === "production" && !isBuilding) {
+    try {
+      const tableExists = await checkSiteSettingTableExists();
+      if (tableExists) {
+        // 获取统计代码ID
+        const analytics = await prisma.siteSetting.findMany({
+          where: {
+            key: {
+              in: ["googleAnalyticsId", "clarityId"],
+            },
+          },
+        });
+
+        if (analytics.length > 0) {
+          analyticsMap = analytics.reduce((acc: AnalyticsMap, setting) => {
+            acc[setting.key] = setting.value || "";
+            return acc;
+          }, { ...analyticsMap });
+        }
       }
+    } catch (error) {
+      console.error("获取分析设置失败:", error);
+      // 出现错误时使用默认的空值
+      analyticsMap = {
+        googleAnalyticsId: "",
+        clarityId: "",
+      };
     }
   }
 
