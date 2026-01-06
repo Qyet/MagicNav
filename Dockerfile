@@ -56,27 +56,32 @@ COPY --from=builder /app/prisma ./prisma/
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma/
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma/
 COPY --from=builder /app/node_modules/prisma ./node_modules/prisma/
+COPY --from=builder /app/node_modules/dotenv-cli ./node_modules/dotenv-cli/
 
 # 暴露端口
 EXPOSE 3000
 
 # 创建生产环境启动脚本
-RUN echo '#!/bin/sh
+RUN cat > /app/start.sh << 'EOF'
+#!/bin/sh
 set -e
 
-# 检查 DATABASE_URL 是否配置
+# Check if DATABASE_URL is configured
 if [ -z "$DATABASE_URL" ]; then
   echo "Error: DATABASE_URL is not set"
   exit 1
 fi
 
-# 执行数据库迁移（生产环境使用 migrate deploy）
+# Run database migrations (use migrate deploy for production)
 echo "Running database migrations..."
-./node_modules/.bin/prisma migrate deploy
+npx prisma migrate deploy
 
-# 启动应用
+# Start application
 echo "Starting application..."
-node server.js' > /app/start.sh && chmod +x /app/start.sh
+node server.js
+EOF
+
+RUN chmod +x /app/start.sh
 
 # 添加健康检查
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
