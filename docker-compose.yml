@@ -1,0 +1,37 @@
+services:
+  # ===============================
+  # MagicNav应用服务（核心服务）
+  # ===============================
+  app:
+    build: .
+    container_name: magicnav-app
+    restart: always
+    ports:
+      - "3000:3000"
+    # 使用环境变量文件
+    env_file:
+      - .env
+    environment:
+      # 提供默认值的环境变量（如果.env中未配置）
+      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@example.com}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin123}
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+    # 健康检查配置（与Dockerfile中的健康检查配合）
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+      start_period: 10s
+
+    networks:
+      - magicnav-network
+
+# ===============================
+# 网络配置
+# ===============================
+networks:
+  magicnav-network:
+    name: magicnav-network
+    driver: bridge

@@ -19,9 +19,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
-    "start": "next start",
+    "start": "npx dotenv -e .env.local -- npx prisma db push && next start",
     "lint": "next lint",
-    "db:push": "dotenv -e .env.local -- prisma db push",
+    "db:push": "npx dotenv -e .env.local -- npx prisma db push",
     "postinstall": "prisma generate"
   },
   "dependencies": {
