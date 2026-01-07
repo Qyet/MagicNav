@@ -84,7 +84,7 @@ export default function LoginPage() {
       <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-green-100 to-blue-100 p-12 text-black">
         <div className="max-w-xl mx-auto flex flex-col justify-center">
           <Image 
-            src="/logo.svg"
+            src="/assets/logo.svg"
             alt="MagicNav Logo"
             width={40}
             height={40}
@@ -105,7 +105,7 @@ export default function LoginPage() {
           {/* 移动端 Logo */}
           <div className="md:hidden text-center mb-8">
             <Image 
-              src="/logo.svg"
+              src="/assets/logo.svg"
               alt="MagicNav Logo"
               width={60}
               height={60}

@@ -352,6 +352,7 @@ export default function BookmarksPage() {
                 fetchFolders(value)
               ]);
             }}
+            disabled={collections.length === 0}
           >
             <SelectTrigger className="w-[200px]">
               <SelectValue placeholder="Select a collection" />

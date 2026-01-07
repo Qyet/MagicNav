@@ -152,8 +152,8 @@ const NavigationSettings = () => {
     <div className="h-full bg-[#f9f9f9]">
       <AdminHeader title="Navigation Menu Settings" />
 
-      <div className="mx-auto px-4 py-12 bg-[#f9f9f9]">
-        <div className="max-w-5xl mx-auto space-y-8">
+      <div className="mx-auto px-2 py-8 bg-[#f9f9f9] sm:px-4 sm:py-12">
+        <div className="max-w-3xl mx-auto space-y-8">
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground font-normal">
               Navigation Menu
@@ -163,19 +163,18 @@ const NavigationSettings = () => {
                 <CardTitle>Navigation Menu Configuration</CardTitle>
                 <CardDescription>Add, edit, and reorder navigation menu items displayed in the header</CardDescription>
               </CardHeader>
-              <CardContent className="p-6">
+              <CardContent className="p-0 pt-3 pb-6">
                 {navigationMenu.length > 0 ? (
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
+                    <Table className="w-full">
+                      <TableHeader className="[&_th]:px-2 [&_th]:sm:px-4">
                         <TableRow>
-                          <TableHead className="w-[35%] min-w-[120px]">Item name</TableHead>
+                          <TableHead className="w-[35%] min-w-[100px]">Item name</TableHead>
                           <TableHead className="w-[45%] min-w-[120px]">URL</TableHead>
-                          <TableHead className="w-[10%] min-w-[150px]">Open in New Tab</TableHead>
-                          <TableHead className="w-[100px]">Actions</TableHead>
+                          <TableHead className="w-[10%] min-w-[80px] sm:w-[10%] sm:min-w-[120px]">Open in New Tab</TableHead>
+                          <TableHead className="w-[100px] min-w-[60px]">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
-                      <TableBody>
+                      <TableBody className="[&_td]:px-2 [&_td]:sm:px-4">
                         {navigationMenu.map((item, index) => (
                           <TableRow key={item.id}>
                             <TableCell>
@@ -246,14 +245,13 @@ const NavigationSettings = () => {
                         ))}
                       </TableBody>
                     </Table>
-                  </div>
                 ) : (
                   <div className="text-center py-12 text-muted-foreground">
                     <p>No menu items found. Click &quot;Add Menu Item&quot; to get started.</p>
                   </div>
                 )}
 
-                <div className="pt-6">
+                <div className="p-6">
                   <Button
                     variant="outline"
                     onClick={addMenuItem}
@@ -264,17 +262,17 @@ const NavigationSettings = () => {
                   </Button>
                 </div>
               </CardContent>
-              <CardFooter className="border-t bg-muted/50 p-6">
-                <div className="flex justify-end w-full">
-                  <Button
-                    onClick={saveSettings}
-                    disabled={isSaving}
-                  >
-                    {isSaving ? 'Saving...' : 'Save Settings'}
-                  </Button>
-                </div>
-              </CardFooter>
             </Card>
+          </div>
+
+          <div className="flex justify-end">
+            <Button
+              onClick={saveSettings}
+              disabled={isSaving}
+              className="inline-flex items-center justify-center gap-2 rounded-full text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-12 w-max px-4 py-2"
+            >
+              {isSaving ? 'Saving...' : 'Save Settings'}
+            </Button>
           </div>
         </div>
       </div>

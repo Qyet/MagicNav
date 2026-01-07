@@ -105,7 +105,7 @@ model SettingImage {
 model Image {
   id            String         @id @default(cuid())
   name          String
-  data          Bytes
+  filePath      String
   mimeType      String
   type          String
   description   String?

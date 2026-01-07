@@ -16,20 +16,28 @@ async function uploadImage(file: File, existingImageId?: string) {
     try {
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
-  
+
+      // 创建文件存储路径
+      const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 10)}${file.name.substring(file.name.lastIndexOf('.'))}`;
+      const filePath = `public/uploads/images/${filename}`;
+      
+      // 保存图片到文件系统
+      const fs = await import('fs/promises');
+      await fs.writeFile(filePath, buffer);
+
       // 只更新 Image 表，不动 SettingImage
       const image = await prisma.image.upsert({
         where: { id: existingImageId || '' },
         update: {
           name: file.name,
-          data: buffer,
+          filePath: `/uploads/images/${filename}`, // 存储相对路径
           mimeType: file.type,
           size: file.size,
           description: `Setting image: ${file.name}`
         },
         create: {
           name: file.name,
-          data: buffer,
+          filePath: `/uploads/images/${filename}`, // 存储相对路径
           mimeType: file.type,
           type: 'setting',
           size: file.size,
@@ -42,7 +50,7 @@ async function uploadImage(file: File, existingImageId?: string) {
           size: true
         }
       });
-  
+
       return image;
     } catch (error) {
       console.error('Failed to upload image:', error);

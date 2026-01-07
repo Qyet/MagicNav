@@ -503,7 +503,7 @@ export const defaultSettings: SettingItem[] = [
 export const defaultImages = [
   {
     name: "logo.png",
-    image: "/default-images/logo.png",
+    image: "/logo.png",
     type: "default",
     settingKeys: [
       {
@@ -513,7 +513,7 @@ export const defaultImages = [
   },
   {
     name: "favicon.ico",
-    image: "/default-images/favicon.ico",
+    image: "/favicon.ico",
     type: "default",
     settingKeys: [
       {
@@ -523,7 +523,7 @@ export const defaultImages = [
   },
   {
     name: "og-image.png",
-    image: "/default-images/og-image.png",
+    image: "/og-image.png",
     type: "default",
     settingKeys: [
       {
@@ -544,12 +544,12 @@ export const defaultImages = [
   {
     name: "carousel-images",
     images: [
-      "/default-images/carousel-1.jpg",
-      "/default-images/carousel-2.jpg", 
-      "/default-images/carousel-3.jpg",
-      "/default-images/carousel-4.jpg",
-      "/default-images/carousel-5.jpg",
-      "/default-images/carousel-6.jpg"
+      "/carousel-1.jpg",
+      "/carousel-2.jpg", 
+      "/carousel-3.jpg",
+      "/carousel-4.jpg",
+      "/carousel-5.jpg",
+      "/carousel-6.jpg"
     ],
     type: "default",
     settingKeys: [

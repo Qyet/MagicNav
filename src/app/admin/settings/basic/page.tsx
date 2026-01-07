@@ -396,7 +396,7 @@ function LogoUploader() {
             </div>
           ) : (
             <Image
-              src={currentLogoUrl || (images && images[0]?.url) || '/default-images/logo.png'}
+              src={currentLogoUrl || (images && images[0]?.url) || '/logo.png'}
               alt="Current Logo"
               fill
               className="object-contain p-2"
@@ -448,7 +448,7 @@ function FaviconUploader() {
         ) : (
           <div className="relative w-[32px] h-[32px] border rounded bg-white">
             <Image
-              src={currentFaviconUrl || (images && images.length > 0 ? images[0].url : '/default-images/favicon.ico')}
+              src={currentFaviconUrl || (images && images.length > 0 ? images[0].url : '/favicon.ico')}
               alt="Current Favicon"
               fill
               className="object-contain p-1"
