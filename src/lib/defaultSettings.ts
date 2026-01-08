@@ -533,7 +533,7 @@ export const defaultImages = [
   },
   {
     name: "spaces-preview.png",
-    image: "/default-images/spaces-preview.png",
+    image: "/assets/spaces-preview.png",
     type: "default",
     settingKeys: [
       {
@@ -544,12 +544,12 @@ export const defaultImages = [
   {
     name: "carousel-images",
     images: [
-      "/carousel-1.jpg",
-      "/carousel-2.jpg", 
-      "/carousel-3.jpg",
-      "/carousel-4.jpg",
-      "/carousel-5.jpg",
-      "/carousel-6.jpg"
+      "/assets/carousel-1.jpg",
+      "/assets/carousel-2.jpg", 
+      "/assets/carousel-3.jpg",
+      "/assets/carousel-4.jpg",
+      "/assets/carousel-5.jpg",
+      "/assets/carousel-6.jpg"
     ],
     type: "default",
     settingKeys: [

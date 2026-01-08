@@ -18,7 +18,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npx prisma generate && next build",
     "start": "npx prisma migrate deploy && next start",
     "lint": "next lint",
     "prisma:generate": "prisma generate",

@@ -2,165 +2,82 @@
 
 import { prisma } from "@/lib/prisma";
 import { defaultSettings, defaultImages } from "@/lib/defaultSettings";
-import pLimit from "p-limit"; // 推荐使用 p-limit 控制并发
-import { headers } from "next/headers";
 
 export async function updateSettingsWithDefaults() {
-  // 尝试从多个来源获取 baseUrl
-  const referer = headers().get('referer');
-  const host = headers().get('host');
-  const xForwardedProto = headers().get('x-forwarded-proto');
+  console.log('开始处理基本设置...');
   
-  let baseUrl = '';
-
-  if (referer) {
-    // 优先使用 Referer 的完整 URL
-    baseUrl = new URL(referer).origin;
-  } else if (host) {
-    // 确定使用的协议
-    let protocol = 'https';
+  // 处理所有默认设置
+  for (const setting of defaultSettings) {
+    console.log(`处理设置: ${setting.key}`);
+    await prisma.siteSetting.upsert({
+      where: { key: setting.key },
+      update: {},
+      create: setting,
+    });
+    console.log(`设置 ${setting.key} 处理完成`);
+  }
+  
+  console.log('开始处理默认图片...');
+  
+  // 处理默认图片
+  for (const imageConfig of defaultImages) {
+    console.log(`处理图片: ${imageConfig.name}`);
     
-    // 检查是否有代理协议头
-    if (xForwardedProto) {
-      protocol = xForwardedProto;
-    } else if (host.includes('localhost') || host.includes('127.0.0.1')) {
-      // 本地环境默认使用 HTTP
-      protocol = 'http';
+    // 处理单个图片
+    if (imageConfig.image) {
+      // 为关联的设置键更新图片路径
+      for (const settingKey of imageConfig.settingKeys) {
+        console.log(`更新设置 ${settingKey.key} 的图片路径`);
+        
+        // 检查设置是否存在，如果不存在则创建
+        const existingSetting = await prisma.siteSetting.findUnique({
+          where: { key: settingKey.key }
+        });
+        
+        if (existingSetting) {
+          await prisma.siteSetting.update({
+            where: { key: settingKey.key },
+            data: { value: imageConfig.image }
+          });
+        } else {
+          // 创建新的设置
+          await prisma.siteSetting.create({
+            data: {
+              key: settingKey.key,
+              value: imageConfig.image,
+              type: 'string',
+              group: 'basic',
+              description: `图片设置: ${imageConfig.name}`
+            }
+          });
+        }
+      }
     }
     
-    baseUrl = `${protocol}://${host}`;
-  }
-
-
-
-  try {
-    // 使用事务确保数据库操作的原子性
-    await prisma.$transaction(async (prisma) => {
-      // 使用并发处理
-      const limit = pLimit(5); // 限制 5 个并发请求
-
-      // 并发处理设置
-      await Promise.all(
-        defaultSettings.map((setting) =>
-          limit(() => 
-            prisma.siteSetting.upsert({
-              where: { key: setting.key },
-              update: {},
-              create: {
-                key: setting.key,
-                value: setting.value,
-                type: setting.type,
-                group: setting.group,
-                description: setting.description,
-              },
-            })
-          )
-        )
-      );
-
-      // 存储需要清理的文件路径，用于事务失败时回滚
-      const filesToCleanup: string[] = [];
-
-      try {
-        // 并发处理图片
-        await Promise.all(
-          defaultImages.map(async (imageData) => {
-
-            for (const settingKey of imageData.settingKeys || []) {
-              const setting = await prisma.siteSetting.findUnique({
-                where: { key: settingKey.key },
-              });
-
-              if (setting) {
-                const existingSettingImage = await prisma.settingImage.findFirst({
-                  where: { settingId: setting.id },
-                });
-
-                if (!existingSettingImage) {
-                  const imagesToProcess = imageData.images || [imageData.image];
-
-                  await Promise.all(
-                    imagesToProcess.map(async (imagePath) => {
-                      try {
-                        const response = await fetch(`${baseUrl}${imagePath}`);
-                        const buffer = await response.arrayBuffer();
-                        
-                        // 创建文件存储路径
-                        const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 10)}${imagePath.substring(imagePath.lastIndexOf('.'))}`;
-                        const filePath = `public/uploads/images/${filename}`;
-                        
-                        // 保存图片到文件系统
-                        const fs = await import('fs/promises');
-                        await fs.writeFile(filePath, Buffer.from(buffer));
-                        filesToCleanup.push(filePath); // 记录需要清理的文件
-
-                        const image = await prisma.image.create({
-                          data: {
-                            name: imageData.name,
-                            filePath: `/uploads/images/${filename}`, // 存储相对路径
-                            mimeType: getMimeType(imagePath),
-                            type: imageData.type,
-                            size: buffer.byteLength,
-                            isPublic: true,
-                          },
-                        });
-
-                        await prisma.settingImage.create({
-                          data: {
-                            settingId: setting.id,
-                            imageId: image.id,
-                            description: `Default ${imageData.name} for ${settingKey.key}`,
-                          },
-                        });
-
-                      } catch (error) {
-                        console.error(`Failed to process image ${imagePath}:`, error);
-                        throw error;
-                      }
-                    })
-                  );
-                }
-              }
-            }
-          })
-        );
-      } catch (imageError) {
-        // 如果图片处理失败，清理已创建的文件
-        const fs = await import('fs/promises');
-        await Promise.all(
-          filesToCleanup.map(async (filePath) => {
-            try {
-              await fs.unlink(filePath);
-            } catch (cleanupError) {
-              console.error(`Failed to cleanup file ${filePath}:`, cleanupError);
-            }
-          })
-        );
-        throw imageError;
+    // 处理图片数组（如轮播图）
+    if (imageConfig.images && imageConfig.images.length > 0) {
+      for (const settingKey of imageConfig.settingKeys) {
+        console.log(`更新设置 ${settingKey.key} 的图片数组`);
+        
+        // 将图片数组转换为逗号分隔的字符串
+        const imagesString = imageConfig.images.join(',');
+        
+        // 更新或创建设置
+        await prisma.siteSetting.upsert({
+          where: { key: settingKey.key },
+          update: { value: imagesString },
+          create: {
+            key: settingKey.key,
+            value: imagesString,
+            type: 'string',
+            group: 'feature',
+            description: `图片数组设置: ${imageConfig.name}`
+          }
+        });
       }
-    });
-  } catch (error) {
-    console.error("Failed to update settings:", error);
-    throw error;
+    }
   }
-}
-
-// 获取文件的 MIME 类型
-function getMimeType(filename: string): string {
-  const ext = filename.split(".").pop()?.toLowerCase();
-  switch (ext) {
-    case "png":
-      return "image/png";
-    case "jpg":
-    case "jpeg":
-      return "image/jpeg";
-    case "gif":
-      return "image/gif";
-    case "webp":
-      return "image/webp";
-    case "ico":
-      return "image/x-icon";
-    default:
-      return "application/octet-stream";
-  }
+  
+  console.log('所有设置和图片处理完成');
+  return true;
 }

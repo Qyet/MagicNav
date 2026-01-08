@@ -6,7 +6,7 @@ import { updateSettingsWithDefaults } from '@/actions/init-settings';
 export const maxDuration = 60; // Vercel Hobby 允许的最大时间是 60 秒
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
     // 调用初始化设置的服务器操作
     await updateSettingsWithDefaults();
