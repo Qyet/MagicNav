@@ -53,8 +53,33 @@ export default function LoginPage() {
           try {
             const initResponse = await fetch("/api/settings/initSettings",{
               cache: "no-store",
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
             });
-            const result = await initResponse.json();
+            
+            console.log("初始化响应状态:", initResponse.status);
+            console.log("初始化响应头:", initResponse.headers);
+            
+            // 检查响应是否为空
+            const responseText = await initResponse.text();
+            console.log("初始化响应内容:", responseText);
+            
+            let result;
+            if (responseText) {
+              try {
+                result = JSON.parse(responseText);
+              } catch (parseError) {
+                console.error("JSON解析错误:", parseError);
+                setError("数据库初始化失败: 服务器返回无效的JSON响应");
+                return;
+              }
+            } else {
+              console.error("服务器返回空响应");
+              setError("数据库初始化失败: 服务器未返回任何响应");
+              return;
+            }
             
             if (!initResponse.ok || result.status !== 'success') {
               // 处理初始化失败的情况，显示更具体的错误信息
