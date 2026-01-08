@@ -56,15 +56,19 @@ export default function LoginPage() {
             });
             const result = await initResponse.json();
             
-            if (result.status !== 'success') {
-              // 处理初始化失败的情况
-              setError(result.message || "Database initialization failed");
+            if (!initResponse.ok || result.status !== 'success') {
+              // 处理初始化失败的情况，显示更具体的错误信息
+              const errorMessage = result.error || result.message || "数据库初始化失败";
+              setError(`数据库初始化失败: ${errorMessage}`);
+              console.error("数据库初始化失败:", result);
               return;
             }
             revalidateData();
           } catch (error) {
-            // 处理网络错误或解析错误
-            setError("Database initialization failed");
+            // 处理网络错误或解析错误，显示更详细的错误信息
+            const errorMessage = error instanceof Error ? error.message : "未知错误";
+            setError(`数据库初始化失败: ${errorMessage}`);
+            console.error("数据库初始化失败:", error);
             return;
           }
         }
